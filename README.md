@@ -28,7 +28,9 @@ python run_pipeline.py --ml
 streamlit run "app/🐟_Spyfish_Data_Tools.py"
 ```
 
-Run `pytest tests/` to check the code. Unit tests do not need outside services. Integration tests need FFmpeg.
+Run `pytest tests/` to check the code. Set `S3_BUCKET` to a test bucket name first. Unit tests do not need outside services. Integration tests need FFmpeg.
+
+On 25 November 2026, a local run with Python 3.12 and `S3_BUCKET=spyfish-test-bucket` had 528 unit tests pass and 19 fail. All 3 integration tests passed. The unit suite also failed on the original source commit used for this copy. These results show the current state of the tests. They do not show that every part of the pipeline works.
 
 The original project uses New Zealand's NeSI computing service for scheduled runs. `run_pipeline.sl` runs the video processing steps. `spyfish/ml/training/train_job.sl` trains the model. Both use SLURM. The same Python commands can also run on a local computer with the required files, tools and service access.
 
