@@ -147,7 +147,7 @@ reporting:
   # override it per view.
   # What the Species search view opens on, first match in the data wins.
   # Something memorable rather than the commonest species, but nothing a
-  # poacher would want a site list for (CLAUDE.md, "Sensitive data"): morays
+  # poacher would want a site list for (PROJECT_NOTES.md, "Sensitive data"): morays
   # and rays are not fished, and both are seen on dozens of deployments.
   # Falls back to `indicator_species`, then the first name in the list.
   species_search_default:
@@ -191,7 +191,7 @@ paths:
     # (fix_keys.yaml, species / survey maps, site matching) plus the cached
     # SharePoint lists under reference/. Under process_files/ so they travel
     # to S3 with the other pipeline data and stay out of git: reference/
-    # and the site coordinates are sensitive (CLAUDE.md, "Sensitive data").
+    # and the site coordinates are sensitive (PROJECT_NOTES.md, "Sensitive data").
     annotations_help: "process_files/legacy_data_help"
   movie_extensions: ["avi", "mov", "mp4", "mpg", "wmv"]
   missing_files_filename: "missing_files_in_aws.txt"

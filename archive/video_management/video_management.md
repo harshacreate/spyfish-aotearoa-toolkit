@@ -1,18 +1,22 @@
-# Video Management Documentation
+<a id="video-management-documentation"></a>
+Video Management Documentation
 
 This directory contains Jupyter notebooks and scripts for managing video files in the Spyfish Aotearoa project. These tools help you work with videos stored in AWS S3, including concatenating multi-part GoPro files, previewing videos, and renaming files in bulk.
 
-## Available Tools
+<a id="available-tools"></a>
+Available Tools
 
-1. **`concat_existing_go_pro.ipynb`** - Concatenate multi-part GoPro video files
-2. **`gopro_concat.py`** - Command-line version for HPC/batch processing
-3. **`local_preview_movies_aws.ipynb`** - Preview videos from S3 in your browser
-4. **`preview_movies_aws.ipynb`** - Alternative preview tool (legacy)
-5. **`rename_files_in_aws_from_csv.ipynb`** - Bulk rename files using a CSV
+1. `concat_existing_go_pro.ipynb` - Concatenate multi-part GoPro video files
+2. `gopro_concat.py` - Command-line version for HPC/batch processing
+3. `local_preview_movies_aws.ipynb` - Preview videos from S3 in your browser
+4. `preview_movies_aws.ipynb` - Alternative preview tool (legacy)
+5. `rename_files_in_aws_from_csv.ipynb` - Bulk rename files using a CSV
 
-## Quick Start Guide
+<a id="quick-start-guide"></a>
+Quick Start Guide
 
-### Prerequisites
+<a id="prerequisites"></a>
+Prerequisites
 
 All notebooks require:
 ```bash
@@ -26,37 +30,41 @@ AWS_SECRET_ACCESS_KEY=your_secret_here
 AWS_DEFAULT_REGION=ap-southeast-2
 ```
 
-### Which Tool Should I Use?
+<a id="which-tool-should-i-use"></a>
+Which Tool Should I Use?
 
-| Task | Recommended Tool |
-|------|------------------|
-| Combine split GoPro videos | `concat_existing_go_pro.ipynb` or `gopro_concat.py` |
-| Watch videos before downloading | `local_preview_movies_aws.ipynb` |
-| Rename multiple files at once | `rename_files_in_aws_from_csv.ipynb` |
-| Batch processing on HPC | `gopro_concat.py` |
+Combine split GoPro videos: `concat_existing_go_pro.ipynb` or `gopro_concat.py`
 
----
+Watch videos before downloading: `local_preview_movies_aws.ipynb`
 
-## Tool 1: Concatenating GoPro Videos
+Rename multiple files at once: `rename_files_in_aws_from_csv.ipynb`
 
-### Using the Notebook: `concat_existing_go_pro.ipynb`
+Batch processing on HPC: `gopro_concat.py`
 
-**Purpose:** Automatically find and combine multi-part GoPro video files into single videos.
 
-#### Step-by-Step Instructions
+<a id="tool-1-concatenating-gopro-videos"></a>
+Tool 1: Concatenating GoPro Videos
 
-1. **Launch Jupyter Notebook**
+<a id="using-the-notebook-concat_existing_go_proipynb"></a>
+Using the Notebook: `concat_existing_go_pro.ipynb`
+
+Purpose: Automatically find and combine multi-part GoPro video files into single videos.
+
+<a id="step-by-step-instructions"></a>
+Step-by-Step Instructions
+
+1. Launch Jupyter Notebook
    ```bash
    jupyter notebook concat_existing_go_pro.ipynb
    ```
 
-2. **Import Required Libraries** (First cell)
+2. Import Required Libraries (First cell)
    ```python
    from sftk.s3_handler import S3Handler
    from sftk.video_handler import VideoProcessor
    ```
 
-3. **Configure Your Settings** (Second cell)
+3. Configure Your Settings (Second cell)
    ```python
    # --- Configuration ---
    S3_PREFIX = "media/HOR_20240408_BUV"  # Your survey folder
@@ -68,7 +76,7 @@ AWS_DEFAULT_REGION=ap-southeast-2
    SEQUENTIAL_DOWNLOAD = False            # Set True for slower, more stable downloads
    ```
 
-4. **Initialize and Preview** (Still second cell)
+4. Initialize and Preview (Still second cell)
    ```python
    # Initialize processor
    s3_handler = S3Handler()
@@ -87,76 +95,92 @@ AWS_DEFAULT_REGION=ap-southeast-2
    display(processor.filtered_df)
    ```
 
-5. **Run the Processing** (Third cell)
+5. Run the Processing (Third cell)
    ```python
    processor.process_gopro_videos()
    ```
 
-6. **Optional: Clean Up Redundant Files** (Fourth cell onwards)
-   - The notebook includes additional cells to find and remove individual files where a concatenated version already exists
-   - Review the list before uncommenting the delete command
+6. Optional: Clean Up Redundant Files (Fourth cell onwards)
+The notebook includes additional cells to find and remove individual files where a concatenated version already exists
 
-#### What Happens During Processing?
+Review the list before uncommenting the delete command
 
-- **Discovery:** Finds all GoPro files in your specified S3 prefix
-- **Grouping:** Groups files by drop and sequence number (e.g., GOPR0298, GP010298, GP020298)
-- **Download:** Downloads video parts in parallel
-- **Validation:** Checks each video file is valid
-- **Concatenation:** Combines parts into single video files
-- **Upload:** Uploads concatenated videos back to S3
-- **Cleanup:** Removes local temporary files (and optionally S3 originals)
+<a id="what-happens-during-processing"></a>
+What Happens During Processing?
 
-#### GoPro File Naming Explained
+Discovery: Finds all GoPro files in your specified S3 prefix
+
+Grouping: Groups files by drop and sequence number (e.g., GOPR0298, GP010298, GP020298)
+
+Download: Downloads video parts in parallel
+
+Validation: Checks each video file is valid
+
+Concatenation: Combines parts into single video files
+
+Upload: Uploads concatenated videos back to S3
+
+Cleanup: Removes local temporary files (and optionally S3 originals)
+
+<a id="gopro-file-naming-explained"></a>
+GoPro File Naming Explained
 
 GoPro cameras split long recordings into multiple files:
-- `GOPR0298.MP4` - First file in recording #0298
-- `GP010298.MP4` - Second file in recording #0298
-- `GP020298.MP4` - Third file in recording #0298
-- `GOPR0392.MP4` - New recording #0392 starts
+`GOPR0298.MP4` - First file in recording #0298
+
+`GP010298.MP4` - Second file in recording #0298
+
+`GP020298.MP4` - Third file in recording #0298
+
+`GOPR0392.MP4` - New recording #0392 starts
 
 The tool automatically detects these sequences and combines them.
 
-#### Multiple Sequences in One Drop
+<a id="multiple-sequences-in-one-drop"></a>
+Multiple Sequences in One Drop
 
 If a drop folder contains multiple GoPro sequences, they are saved with suffix letters:
-- Sequence 0298 → `DropID_A.mp4`
-- Sequence 0392 → `DropID_B.mp4`
-- Sequence 0425 → `DropID_C.mp4`
+Sequence 0298 → `DropID_A.mp4`
 
----
+Sequence 0392 → `DropID_B.mp4`
 
-## Tool 2: Previewing Videos
+Sequence 0425 → `DropID_C.mp4`
 
-### Using the Notebook: `local_preview_movies_aws.ipynb`
+<a id="tool-2-previewing-videos"></a>
+Tool 2: Previewing Videos
 
-**Purpose:** Watch videos stored in S3 without downloading them to your computer.
+<a id="using-the-notebook-local_preview_movies_awsipynb"></a>
+Using the Notebook: `local_preview_movies_aws.ipynb`
 
-#### Step-by-Step Instructions
+Purpose: Watch videos stored in S3 without downloading them to your computer.
 
-1. **Launch the Notebook**
+<a id="step-by-step-instructions-1"></a>
+Step-by-Step Instructions
+
+1. Launch the Notebook
    ```bash
    jupyter notebook local_preview_movies_aws.ipynb
    ```
 
-2. **Import Libraries** (First cell)
+2. Import Libraries (First cell)
    ```python
    from sftk.s3_handler import S3Handler
    from sftk.video_handler import VideoProcessor
    ```
 
-3. **Initialize Handlers** (Second cell)
+3. Initialize Handlers (Second cell)
    ```python
    s3_handler = S3Handler()
    processor = VideoProcessor(s3_handler)
    ```
 
-4. **Preview a Specific Video** (Third cell)
+4. Preview a Specific Video (Third cell)
    ```python
    movie_key = "media/HOR_20240408_BUV/HOR_20240408_BUV_HOR_096_01/HOR_20240408_BUV_HOR_096_01.mp4"
    display(processor.preview_movie(movie_key))
    ```
 
-5. **List All Videos in a Folder** (Fourth cell)
+5. List All Videos in a Folder (Fourth cell)
    ```python
    S3_PREFIX = "media/HOR_20240408_BUV/HOR_20240408_BUV_HOR_096_01/"
 
@@ -167,24 +191,29 @@ If a drop folder contains multiple GoPro sequences, they are saved with suffix l
    display(movies_df)
    ```
 
-#### Tips for Previewing
+<a id="tips-for-previewing"></a>
+Tips for Previewing
 
-- Videos stream directly from S3 - no download needed
-- The preview URL expires after a few hours
-- Use this to verify videos before processing
-- Great for checking if concatenation worked correctly
+Videos stream directly from S3 - no download needed
 
----
+The preview URL expires after a few hours
 
-## Tool 3: Bulk Renaming Files
+Use this to verify videos before processing
 
-### Using the Notebook: `rename_files_in_aws_from_csv.ipynb`
+Great for checking if concatenation worked correctly
 
-**Purpose:** Rename multiple video files in S3 using a CSV file with old and new names.
+<a id="tool-3-bulk-renaming-files"></a>
+Tool 3: Bulk Renaming Files
 
-#### Step-by-Step Instructions
+<a id="using-the-notebook-rename_files_in_aws_from_csvipynb"></a>
+Using the Notebook: `rename_files_in_aws_from_csv.ipynb`
 
-1. **Prepare Your CSV File**
+Purpose: Rename multiple video files in S3 using a CSV file with old and new names.
+
+<a id="step-by-step-instructions-2"></a>
+Step-by-Step Instructions
+
+1. Prepare Your CSV File
 
    Create a CSV with two columns containing old and new S3 keys:
    ```csv
@@ -195,12 +224,12 @@ If a drop folder contains multiple GoPro sequences, they are saved with suffix l
 
    Save this as `rename_movies.csv` in your data folder.
 
-2. **Launch the Notebook**
+2. Launch the Notebook
    ```bash
    jupyter notebook rename_files_in_aws_from_csv.ipynb
    ```
 
-3. **Import Libraries** (First cell)
+3. Import Libraries (First cell)
    ```python
    import pandas as pd
    import os
@@ -208,26 +237,26 @@ If a drop folder contains multiple GoPro sequences, they are saved with suffix l
    from sftk.s3_handler import S3Handler
    ```
 
-4. **Connect to S3** (Second cell)
+4. Connect to S3 (Second cell)
    ```python
    s3_handler = S3Handler()
    ```
 
-5. **Configure File Paths** (Third cell)
+5. Configure File Paths (Third cell)
    ```python
    file_path = os.path.join(LOCAL_DATA_FOLDER_PATH, "rename_movies.csv")
    new_name_column = "NEW"
    old_name_column = "OLD"
    ```
 
-6. **Load and Preview Changes** (Fourth cell)
+6. Load and Preview Changes (Fourth cell)
    ```python
    rename_csv_df = pd.read_csv(file_path)
    rename_pairs = dict(zip(rename_csv_df[old_name_column], rename_csv_df[new_name_column]))
    print(rename_pairs)  # Review what will be renamed
    ```
 
-7. **Execute Renaming** (Fifth cell)
+7. Execute Renaming (Fifth cell)
    ```python
    s3_handler.rename_s3_objects_from_dict(
        rename_pairs,
@@ -236,14 +265,19 @@ If a drop folder contains multiple GoPro sequences, they are saved with suffix l
    )
    ```
 
-#### Important Notes
+<a id="important-notes"></a>
+Important Notes
 
-- **Always test first:** Use `try_run=True` to preview changes without making them
-- **Backup important data:** Renaming cannot be easily undone
-- **Check paths carefully:** A typo can rename the wrong file
-- **Verify after renaming:** Use the preview notebook to confirm changes
+Always test first: Use `try_run=True` to preview changes without making them
 
-#### Optional: Export S3 File List
+Backup important data: Renaming cannot be easily undone
+
+Check paths carefully: A typo can rename the wrong file
+
+Verify after renaming: Use the preview notebook to confirm changes
+
+<a id="optional-export-s3-file-list"></a>
+Optional: Export S3 File List
 
 The notebook includes a section to export all S3 paths to CSV:
 ```python
@@ -260,15 +294,16 @@ with open('file_paths_per_row.csv', 'w', newline='', encoding='utf-8') as file:
 
 This creates a list you can use to build your rename CSV.
 
----
+<a id="command-line-tool-gopro_concatpy"></a>
+Command-Line Tool: `gopro_concat.py`
 
-## Command-Line Tool: `gopro_concat.py`
+Purpose: Run GoPro concatenation from the command line or on HPC systems like NeSI.
 
-**Purpose:** Run GoPro concatenation from the command line or on HPC systems like NeSI.
+<a id="local-usage"></a>
+Local Usage
 
-### Local Usage
-
-#### Prerequisites
+<a id="prerequisites-1"></a>
+Prerequisites
 
 ```bash
 # Install dependencies
@@ -278,14 +313,16 @@ pip install boto3 pandas python-dotenv
 ffmpeg -version
 ```
 
-#### Basic Usage
+<a id="basic-usage"></a>
+Basic Usage
 
 ```bash
 # Process videos with auto-detected paths
 python gopro_concat.py --prefix "media/BNP_20210127"
 ```
 
-#### Full Options
+<a id="full-options"></a>
+Full Options
 
 ```bash
 python gopro_concat.py \
@@ -296,31 +333,40 @@ python gopro_concat.py \
   --delete-originals
 ```
 
-#### Available Arguments
+<a id="available-arguments"></a>
+Available Arguments
 
-| Argument | Description | Default |
-|----------|-------------|---------|
-| `--prefix` | S3 prefix for video files (required) | - |
-| `--gopro-prefix` | Prefix for GoPro files (G, GX, GH, etc.) | `G` |
-| `--delete-originals` | Delete original parts from S3 after concatenation | `False` |
-| `--test-mode` | Process only last drop, skip upload | `False` |
-| `--parallel-drops` | Number of drops to process simultaneously | `1` |
-| `--download-threads` | Parallel downloads per drop | `4` |
-| `--sequential-download` | Download files one at a time | `False` |
-| `--use-nesi-ffmpeg` | Load FFmpeg from NeSI modules | `False` |
-| `--toolkit-path` | Path to toolkit (auto-detected if omitted) | Auto |
+Argument: `--prefix`; Description: S3 prefix for video files (required); Default: -
 
-#### Get Help
+Argument: `--gopro-prefix`; Description: Prefix for GoPro files (G, GX, GH, etc.); Default: `G`
+
+Argument: `--delete-originals`; Description: Delete original parts from S3 after concatenation; Default: `False`
+
+Argument: `--test-mode`; Description: Process only last drop, skip upload; Default: `False`
+
+Argument: `--parallel-drops`; Description: Number of drops to process simultaneously; Default: `1`
+
+Argument: `--download-threads`; Description: Parallel downloads per drop; Default: `4`
+
+Argument: `--sequential-download`; Description: Download files one at a time; Default: `False`
+
+Argument: `--use-nesi-ffmpeg`; Description: Load FFmpeg from NeSI modules; Default: `False`
+
+Argument: `--toolkit-path`; Description: Path to toolkit (auto-detected if omitted); Default: Auto
+
+
+<a id="get-help"></a>
+Get Help
 
 ```bash
 python gopro_concat.py --help
 ```
 
----
+<a id="running-on-nesi-hpc"></a>
+Running on NeSI HPC
 
-## Running on NeSI HPC
-
-### Setup Virtual Environment (One-Time)
+<a id="setup-virtual-environment-one-time"></a>
+Setup Virtual Environment (One-Time)
 
 ```bash
 # Load Python module
@@ -336,7 +382,8 @@ source ~/venvs/spyfish-env/bin/activate
 pip install boto3 pandas python-dotenv
 ```
 
-### Method 1: Interactive Session
+<a id="method-1-interactive-session"></a>
+Method 1: Interactive Session
 
 ```bash
 # Request interactive resources
@@ -356,7 +403,8 @@ python gopro_concat.py \
   --parallel-drops 2
 ```
 
-### Method 2: Batch Job (Recommended)
+<a id="method-2-batch-job-recommended"></a>
+Method 2: Batch Job (Recommended)
 
 Create a Slurm script `run_gopro_concat.sl`:
 
@@ -410,7 +458,8 @@ squeue -u $USER
 tail -f logs/gopro_<jobid>.log
 ```
 
-### Method 3: Processing Multiple Surveys
+<a id="method-3-processing-multiple-surveys"></a>
+Method 3: Processing Multiple Surveys
 
 Create `run_multiple_surveys.sl`:
 
@@ -459,20 +508,20 @@ done
 echo "All surveys processed at $(date)"
 ```
 
----
+<a id="common-workflows"></a>
+Common Workflows
 
-## Common Workflows
+<a id="workflow-1-processing-a-new-survey"></a>
+Workflow 1: Processing a New Survey
 
-### Workflow 1: Processing a New Survey
-
-1. **First, preview what videos exist:**
+1. First, preview what videos exist:
    ```python
    # In local_preview_movies_aws.ipynb
    movies_df = processor.get_movies_df(prefix="media/YOUR_SURVEY/")
    display(movies_df)
    ```
 
-2. **Then concatenate GoPro files:**
+2. Then concatenate GoPro files:
    ```python
    # In concat_existing_go_pro.ipynb
    S3_PREFIX = "media/YOUR_SURVEY"
@@ -480,14 +529,14 @@ echo "All surveys processed at $(date)"
    # ... run processing
    ```
 
-3. **Verify results:**
+3. Verify results:
    ```python
    # In local_preview_movies_aws.ipynb
    movie_key = "media/YOUR_SURVEY/DROP_ID/DROP_ID_A.mp4"
    display(processor.preview_movie(movie_key))
    ```
 
-4. **Clean up if successful:**
+4. Clean up if successful:
    ```python
    # In concat_existing_go_pro.ipynb
    DELETE_ORIGINALS = True
@@ -495,117 +544,150 @@ echo "All surveys processed at $(date)"
    # ... run processing again
    ```
 
-### Workflow 2: Fixing Incorrectly Named Files
+<a id="workflow-2-fixing-incorrectly-named-files"></a>
+Workflow 2: Fixing Incorrectly Named Files
 
-1. **Export current file list:**
+1. Export current file list:
    ```python
    # In rename_files_in_aws_from_csv.ipynb
    foo = s3_handler.get_file_paths_set_from_s3(prefix="media/YOUR_SURVEY/")
    # ... export to CSV
    ```
 
-2. **Edit CSV in Excel/Sheets:**
-   - Add OLD and NEW columns
-   - Fill in correct names
+2. Edit CSV in Excel/Sheets:
+Add OLD and NEW columns
 
-3. **Preview and execute renames:**
+Fill in correct names
+
+3. Preview and execute renames:
    ```python
    # Still in rename_files_in_aws_from_csv.ipynb
    s3_handler.rename_s3_objects_from_dict(rename_pairs, try_run=True)
    # Review output, then set try_run=False
    ```
 
-### Workflow 3: Batch Processing on NeSI
+<a id="workflow-3-batch-processing-on-nesi"></a>
+Workflow 3: Batch Processing on NeSI
 
-1. **Test locally first:**
+1. Test locally first:
    ```python
    # In concat_existing_go_pro.ipynb with TEST_MODE = True
    ```
 
-2. **Create Slurm job:**
+2. Create Slurm job:
    ```bash
    # Use gopro_concat.py with --use-nesi-ffmpeg
    ```
 
-3. **Monitor and verify:**
+3. Monitor and verify:
    ```bash
    tail -f logs/gopro_<jobid>.log
    ```
 
----
+<a id="troubleshooting"></a>
+Troubleshooting
 
-## Troubleshooting
+<a id="cannot-connect-to-s3"></a>
+"Cannot connect to S3"
+Check your `~/.env` file exists and contains valid AWS credentials
 
-### "Cannot connect to S3"
-- Check your `~/.env` file exists and contains valid AWS credentials
-- Verify credentials: `cat ~/.env`
-- Ensure you have network access to AWS
+Verify credentials: `cat ~/.env`
 
-### "Module sftk not found"
-- Make sure you're running notebooks from the correct directory
-- The `sftk` package should be in the parent directory
-- Check with: `import sys; print(sys.path)`
+Ensure you have network access to AWS
 
-### "FFmpeg not found"
-- On local machine: Install FFmpeg (`brew install ffmpeg` on Mac, or download from ffmpeg.org)
-- On NeSI: Use `--use-nesi-ffmpeg` flag or load module manually
+<a id="module-sftk-not-found"></a>
+"Module sftk not found"
+Make sure you're running notebooks from the correct directory
 
-### Videos won't play in preview
-- Preview URLs expire after a few hours - regenerate them
-- Check browser console for errors
-- Verify the file exists in S3 with correct permissions
+The `sftk` package should be in the parent directory
 
-### Concatenation fails partway through
-- Check available disk space (needs 2x video size)
-- Verify all source files are valid videos
-- Try with `SEQUENTIAL_DOWNLOAD = True` for more stability
-- Review error messages for specific file issues
+Check with: `import sys; print(sys.path)`
 
-### Renaming affects wrong files
-- **Always use `try_run=True` first!**
-- Double-check your CSV column names match configuration
-- Verify paths are complete S3 keys, not just filenames
+<a id="ffmpeg-not-found"></a>
+"FFmpeg not found"
+On local machine: Install FFmpeg (`brew install ffmpeg` on Mac, or download from ffmpeg.org)
 
----
+On NeSI: Use `--use-nesi-ffmpeg` flag or load module manually
 
-## Best Practices
+<a id="videos-wont-play-in-preview"></a>
+Videos won't play in preview
+Preview URLs expire after a few hours - regenerate them
 
-1. **Always test first:**
-   - Use `TEST_MODE = True` for concatenation
-   - Use `try_run=True` for renaming
-   - Preview one video before processing hundreds
+Check browser console for errors
 
-2. **Keep backups:**
-   - Don't delete originals immediately
-   - Verify concatenated videos play correctly
-   - Export file lists before bulk operations
+Verify the file exists in S3 with correct permissions
 
-3. **Work in stages:**
-   - Process one survey at a time
-   - Start with small `PARALLEL_DROPS` values
-   - Increase parallelization once stable
+<a id="concatenation-fails-partway-through"></a>
+Concatenation fails partway through
+Check available disk space (needs 2x video size)
 
-4. **Monitor resources:**
-   - Watch disk space during processing
-   - Check memory usage on HPC
-   - Keep log files for debugging
+Verify all source files are valid videos
 
-5. **Document changes:**
-   - Save CSV files used for renaming
-   - Keep notes on which surveys were processed
-   - Record any issues encountered
+Try with `SEQUENTIAL_DOWNLOAD = True` for more stability
 
----
+Review error messages for specific file issues
 
-## Performance Tips
+<a id="renaming-affects-wrong-files"></a>
+Renaming affects wrong files
+Always use `try_run=True` first!
 
-### Local Processing
-- **Fast internet:** Increase `DOWNLOAD_THREADS` to 8
-- **Limited bandwidth:** Use `SEQUENTIAL_DOWNLOAD = True`
-- **Many drops:** Increase `PARALLEL_DROPS` to 3-4
-- **Low memory:** Process one drop at a time (`PARALLEL_DROPS = 1`)
+Double-check your CSV column names match configuration
 
-### HPC Processing
+Verify paths are complete S3 keys, not just filenames
+
+<a id="best-practices"></a>
+Best Practices
+
+1. Always test first:
+Use `TEST_MODE = True` for concatenation
+
+Use `try_run=True` for renaming
+
+Preview one video before processing hundreds
+
+2. Keep backups:
+Don't delete originals immediately
+
+Verify concatenated videos play correctly
+
+Export file lists before bulk operations
+
+3. Work in stages:
+Process one survey at a time
+
+Start with small `PARALLEL_DROPS` values
+
+Increase parallelization once stable
+
+4. Monitor resources:
+Watch disk space during processing
+
+Check memory usage on HPC
+
+Keep log files for debugging
+
+5. Document changes:
+Save CSV files used for renaming
+
+Keep notes on which surveys were processed
+
+Record any issues encountered
+
+<a id="performance-tips"></a>
+Performance Tips
+
+<a id="local-processing"></a>
+Local Processing
+Fast internet: Increase `DOWNLOAD_THREADS` to 8
+
+Limited bandwidth: Use `SEQUENTIAL_DOWNLOAD = True`
+
+Many drops: Increase `PARALLEL_DROPS` to 3-4
+
+Low memory: Process one drop at a time (`PARALLEL_DROPS = 1`)
+
+<a id="hpc-processing"></a>
+HPC Processing
 ```bash
 # For large surveys (100+ drops):
 #SBATCH --mem=32G
@@ -618,11 +700,11 @@ echo "All surveys processed at $(date)"
 --parallel-drops 1 --download-threads 4
 ```
 
----
+<a id="monitoring-jobs-on-nesi"></a>
+Monitoring Jobs on NeSI
 
-## Monitoring Jobs on NeSI
-
-### Check Job Status
+<a id="check-job-status"></a>
+Check Job Status
 
 ```bash
 # List your jobs
@@ -635,7 +717,8 @@ scontrol show job <jobid>
 scancel <jobid>
 ```
 
-### View Logs
+<a id="view-logs"></a>
+View Logs
 
 ```bash
 # Watch live output
@@ -648,8 +731,7 @@ grep -i error logs/gopro_<jobid>.log
 sacct -j <jobid> --format=JobID,JobName,State,ExitCode,Elapsed
 ```
 
----
-
-## Contact
+<a id="contact"></a>
+Contact
 
 For issues or questions, contact the Spyfish Aotearoa team or submit an issue on the repository.

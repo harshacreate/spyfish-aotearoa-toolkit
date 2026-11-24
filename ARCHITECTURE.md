@@ -1,26 +1,24 @@
-# 🐟 Spyfish — System Architecture
+<a id="-spyfish--system-architecture"></a>
+How Spyfish works
 
-> **North Star Reference** · Last updated: 15 May 2026
->
-> This document is the single source of truth for Spyfish.
-> Every stakeholder — rangers, scientists, engineers, and contributors — should
-> refer to this to understand what we're building and where we're headed.
+Last updated by the original project: 15 May 2026
 
----
+This guide explains how Spyfish works and what the original project plans to add.
+It is for rangers, scientists, engineers and other contributors.
 
-## What is Spyfish?
+<a id="what-is-spyfish"></a>
+What is Spyfish?
 
-**Spyfish** is a methodology for turning underwater footage into structured
-biological observations. It is not tied to any specific tool, platform, or
-location — any group collecting underwater video can follow the same steps.
+Spyfish is a way to turn underwater video into records of marine life.
+Groups collecting underwater video can use these steps with different tools
+and in different places.
 
-**Spyfish Aotearoa** is the first implementation of Spyfish, built for
+Spyfish Aotearoa is the first implementation of Spyfish, built for
 New Zealand's marine protected areas using AWS, YOLO, Zooniverse, BIIGLE,
 and a Streamlit dashboard.
 
----
-
-## The Big Picture
+<a id="the-big-picture"></a>
+The Big Picture
 
 ```
   1. Fieldwork         2. Storage         3. Annotation         4. Dashboard         5. Sharing
@@ -28,7 +26,8 @@ and a Streamlit dashboard.
   and metadata         storage           Expert review          privately           and data
 ```
 
-### Spyfish Aotearoa — System Context
+<a id="spyfish-aotearoa--system-context"></a>
+Spyfish Aotearoa, System Context
 
 ```mermaid
 flowchart TB
@@ -65,44 +64,55 @@ flowchart TB
     S3 --> DASH
 ```
 
----
+<a id="who-uses-what"></a>
+Who Uses What
 
-## Who Uses What
+Stakeholder: DOC Rangers; What they do: Deploy cameras, enter field metadata, view survey status.; Primary tools: PowerApps, Video Uploader App; Secondary tools: Streamlit Dashboard (survey status, view-only)
 
-| Stakeholder | What they do | Primary tools | Secondary tools |
-|---|---|---|---|
-| **DOC Rangers** | Deploy cameras, enter field metadata, view survey status. | PowerApps, Video Uploader App | Streamlit Dashboard (survey status, view-only) |
-| **DOC Scientists** | Analyse data, monitor species trends, generate reports. | **Streamlit Dashboard** (Maps & Reports) | SharePoint |
-| **Core Team** | Keep the pipeline running, manage errors, retrain models. | **Streamlit Dashboard** + CLI, GitHub, Notion | — |
-| **External Researchers / Ecologists** | Contribute expertise (species ID, fish sizing, bounding boxes). | **Streamlit Dashboard**, Notion, BIIGLE | — |
-| **Citizen Scientists** | Classify 10-second video clips into species categories. | **Zooniverse** | — |
+Stakeholder: DOC Scientists; What they do: Analyse data, monitor species trends, generate reports.; Primary tools: Streamlit Dashboard (Maps & Reports); Secondary tools: SharePoint
 
----
+Stakeholder: Core Team; What they do: Keep the pipeline running, manage errors, retrain models.; Primary tools: Streamlit Dashboard + CLI, GitHub, Notion; Secondary tools: .
 
-## Technology Stack
+Stakeholder: External Researchers / Ecologists; What they do: Contribute expertise (species ID, fish sizing, bounding boxes).; Primary tools: Streamlit Dashboard, Notion, BIIGLE; Secondary tools: .
 
-| Layer | Technology | Why |
-|---|---|---|
-| **Language** | Python 3.12+ | ML ecosystem, data manipulation, all external API clients |
-| **ML Model** | Ultralytics YOLOv12 | Real-time object detection; active development |
-| **Video Processing** | OpenCV + FFmpeg | OpenCV for frame extraction (pixel parity with YOLO); FFmpeg for clip encoding |
-| **Database** | SQLite (2 files) | Zero infrastructure, file-based, synced to S3; fits ~1k deployments/year |
-| **Cloud Storage** | AWS S3 (`marine-buv`) | DOC-managed shared store for videos, databases, and outputs |
-| **GPU Compute** | NIWA Mahuika HPC (Slurm) | NeSI allocation for NZ-based research; GPU acceleration |
-| **Citizen Science** | Zooniverse + Caesar | Volunteer classification with automated retirement rules |
-| **Expert Annotation** | BIIGLE (REST API) | Full species list, bounding boxes, future substrate/size review |
-| **Dashboard & Reporting** | Streamlit | Pipeline ops, maps, graphs, species reporting — serves all audiences |
-| **Metadata Entry** | PowerApps | Mobile-first field data entry for rangers |
-| **Video Upload** | Video Uploader App (BytesNZ) | Concatenates GoPro segments, uploads to S3 |
-| **Configuration** | YAML + python-dotenv | Non-secret config in `config.yaml`; secrets in `.env` |
+Stakeholder: Citizen Scientists; What they do: Classify 10-second video clips into species categories.; Primary tools: Zooniverse; Secondary tools: .
 
----
 
-## Data Pipeline — End to End (Spyfish Aotearoa)
+<a id="technology-stack"></a>
+Technology Stack
+
+Layer: Language; Technology: Python 3.12+; Why: ML ecosystem, data manipulation, all external API clients
+
+Layer: ML Model; Technology: Ultralytics YOLOv12; Why: Real-time object detection; active development
+
+Layer: Video Processing; Technology: OpenCV + FFmpeg; Why: OpenCV for frame extraction (pixel parity with YOLO); FFmpeg for clip encoding
+
+Layer: Database; Technology: SQLite (2 files); Why: Zero infrastructure, file-based, synced to S3; fits ~1k deployments/year
+
+Layer: Cloud Storage; Technology: AWS S3 (`marine-buv`); Why: DOC-managed shared store for videos, databases, and outputs
+
+Layer: GPU Compute; Technology: NIWA Mahuika HPC (Slurm); Why: NeSI allocation for NZ-based research; GPU acceleration
+
+Layer: Citizen Science; Technology: Zooniverse + Caesar; Why: Volunteer classification with automated retirement rules
+
+Layer: Expert Annotation; Technology: BIIGLE (REST API); Why: Full species list, bounding boxes, future substrate/size review
+
+Layer: Dashboard & Reporting; Technology: Streamlit; Why: Pipeline ops, maps, graphs, species reporting. serves all audiences
+
+Layer: Metadata Entry; Technology: PowerApps; Why: Mobile-first field data entry for rangers
+
+Layer: Video Upload; Technology: Video Uploader App (BytesNZ); Why: Concatenates GoPro segments, uploads to S3
+
+Layer: Configuration; Technology: YAML + python-dotenv; Why: Non-secret config in `config.yaml`; secrets in `.env`
+
+
+<a id="data-pipeline--end-to-end-spyfish-aotearoa"></a>
+Data Pipeline, End to End (Spyfish Aotearoa)
 
 This is the journey of a single underwater video from the ocean to a conservation report.
 
-### Phase 1 — Field to Cloud
+<a id="phase-1--field-to-cloud"></a>
+Phase 1, Field to Cloud
 
 ```mermaid
 flowchart LR
@@ -114,7 +124,8 @@ flowchart LR
     F --> G
 ```
 
-### Phase 2 — Automated Pipeline
+<a id="phase-2--automated-pipeline"></a>
+Phase 2, Automated Pipeline
 
 ```mermaid
 flowchart LR
@@ -129,9 +140,8 @@ flowchart LR
     EX --> DB
 ```
 
-
-
-### Phase 3 — Dashboard
+<a id="phase-3--dashboard"></a>
+Phase 3, Dashboard
 
 ```mermaid
 flowchart LR
@@ -141,30 +151,33 @@ flowchart LR
     DASH --> DEV["🔧 Development Tools<br/>AI model metrics<br/>Annotation conflicts<br/>Dev actions"]
 ```
 
-### Phase 4 — Sharing
+<a id="phase-4--sharing"></a>
+Phase 4, Sharing
 
 Publish insights and data back to the wider community:
-- Export standardised data to **OBIS** or other biodiversity platforms
-- Generate semi-automated reports for conservation stakeholders
-- Share results with citizen science volunteers who contributed
+Export standardised data to OBIS or other biodiversity platforms
 
----
+Generate semi-automated reports for conservation stakeholders
 
-## Streamlit Dashboard Pages
+Share results with citizen science volunteers who contributed
 
-The Streamlit app (`app/`) is the **single reporting and operations interface** for all stakeholders.
+<a id="streamlit-dashboard-pages"></a>
+Streamlit Dashboard Pages
 
-Its core is the DOC report (`app/doc_report/`): **two sections carrying the same
-view names**, each asking a different question of the same data. Reporting
-answers *"what is out there"*; Operations answers *"what state is the data in"*.
+The Streamlit app (`app/`) is the single reporting and operations interface for all stakeholders.
+
+Its core is the DOC report (`app/doc_report/`): two sections carrying the same
+view names, each asking a different question of the same data. Reporting
+answers "what is out there"; Operations answers "what state is the data in".
 Both share one filter band (survey year, MPA, annotation source) and one context
 dict, so no two views can disagree about how many deployments exist.
 
-| Section | Views | Audience |
-|---|---|---|
-| 📊 **Reporting** | Report home, MPA, Sites, Annotations, Species, Species search (Surveys and Deployments not built yet) | DOC Scientists, Rangers, external researchers |
-| 🔄 **Operations** | Operations home, MPA, Surveys, Deployments, Annotations, Model Metrics, Metadata error review (Sites and Species not built yet) | Core Team |
-| 🧪 **Tools** | Deployment Videos, Substrate Cover, Legacy MaxN check (`pages/_advanced/`) | Core Team |
+Section: 📊 Reporting; Views: Report home, MPA, Sites, Annotations, Species, Species search (Surveys and Deployments not built yet); Audience: DOC Scientists, Rangers, external researchers
+
+Section: 🔄 Operations; Views: Operations home, MPA, Surveys, Deployments, Annotations, Model Metrics, Metadata error review (Sites and Species not built yet); Audience: Core Team
+
+Section: 🧪 Tools; Views: Deployment Videos, Substrate Cover, Legacy MaxN check (`pages/_advanced/`); Audience: Core Team
+
 
 The University of Auckland mussel-farm dashboard (Mussel Insights, ML vs Expert)
 is a separate Streamlit app in `in_progress/uoa/` (`cd in_progress/uoa && streamlit
@@ -176,49 +189,55 @@ looks like a view reporting nothing.
 
 Notable views, for orientation:
 
-* **Reporting · MPA** — per-reserve rollup beside the protection-class
+Reporting · MPA, per-reserve rollup beside the protection-class
+
   breakdown, MPA populations, the gated site map, and reserve trends drawn as
-  one line per reserve *per side of the boundary*.
-* **Reporting · Species** — protected against unprotected (box plots, one dot
+  one line per reserve per side of the boundary.
+Reporting · Species, protected against unprotected (box plots, one dot
+
   per deployment), detection rate, frequency vs abundance, co-occurrence,
   accumulation.
-* **Operations · Annotations** — coverage by source, source disagreement, ML
+Operations · Annotations, coverage by source, source disagreement, ML
+
   against expert, and the calibration scatter.
-* **Operations · Metadata error review** — validation errors from the ingest
+Operations · Metadata error review, validation errors from the ingest
+
   step, grouped by type, file and survey.
 
 Two conventions worth knowing before reading any chart:
 
-* **Protection is three groups.** Exactly one status counts as protected
+Protection is three groups. Exactly one status counts as protected
+
   (Type I MPA) and one as unprotected (No protection); every partial or unclear
-  regime is **Other**, and inside/outside comparisons leave it out and say how
+  regime is Other, and inside/outside comparisons leave it out and say how
   many deployments that was. Charts that show the class rather than a
   comparison keep every status.
-* **Coordinates are gated.** Site positions joined to abundance read as a
+Coordinates are gated. Site positions joined to abundance read as a
+
   fishing map, and for rare species as a poaching aid, so every map sits behind
   its own password, separate from the app password.
 
 Architecture, layer by layer, is in
-**[design_doc.md](design_doc.md)** under *Report architecture*: a data layer
+[design_doc.md](design_doc.md) under Report architecture: a data layer
 (loading, filtering, aggregation), a chart layer (one function per chart), and a
-view layer (which questions, in what order) — so a change to what a page says
+view layer (which questions, in what order), so a change to what a page says
 and a change to how a chart looks are never the same edit.
 
-> **Access control today**: three shared passwords, not roles. `APP_PASSWORD`
-> gates the whole app, `MAP_PASSWORD` gates site coordinates wherever a map
-> appears, and `TEST_DASHBOARD_PASSWORD` gates unreleased dashboards. Anyone
-> past the app password sees every page.
->
-> **Intended**: per-role access, so Rangers can view survey status without being
-> able to trigger pipeline actions, Scientists get the Reporting section, and the
-> Core Team has full access. Not built — the section split (Reporting /
-> Operations) is the natural seam to hang it on when it is.
+Access control today: three shared passwords, not roles. `APP_PASSWORD`
+gates the whole app, `MAP_PASSWORD` gates site coordinates wherever a map
+appears, and `TEST_DASHBOARD_PASSWORD` gates unreleased dashboards. Anyone
+past the app password sees every page.
 
----
+Intended: per-role access, so Rangers can view survey status without being
+able to trigger pipeline actions, Scientists get the Reporting section, and the
+Core Team has full access. Not built, the section split (Reporting /
+Operations) is the natural seam to hang it on when it is.
 
-## Data Architecture
+<a id="data-architecture"></a>
+Data Architecture
 
-### Two Databases, Two Concerns
+<a id="two-databases-two-concerns"></a>
+Two Databases, Two Concerns
 
 ```
 spyfish_pipeline.db              spyfish_annotations.db
@@ -228,24 +247,27 @@ sites        (reference data)
 validation_errors (data quality)
 ```
 
-**Why separate?** Pipeline state (where is this deployment in the workflow?) and
+Why separate? Pipeline state (where is this deployment in the workflow?) and
 observation data (what species were seen?) have different access patterns.
 Separating them lets annotation data be queried and exported without locking
 pipeline state during processing.
 
-### What goes into annotations.db
+<a id="what-goes-into-annotationsdb"></a>
+What goes into annotations.db
 
 All three annotation sources write to the same `annotations` table:
 
-| Source | When | `annotated_by` value |
-|---|---|---|
-| **ML inference** | After YOLO runs (Step 2-3) | Model name (e.g. `cfd_binary_water_20260301`) |
-| **Volunteer agreement** | After Zooniverse sync (Step 5) | `citsci` |
-| **Expert annotation** | After BIIGLE sync (Step 7) | `expert` |
+Source: ML inference; When: After YOLO runs (Step 2-3); `annotated_by` value: Model name (e.g. `cfd_binary_water_20260301`)
 
-### Pipeline Status Model
+Source: Volunteer agreement; When: After Zooniverse sync (Step 5); `annotated_by` value: `citsci`
 
-Each deployment tracks **five independent sections** that progress separately:
+Source: Expert annotation; When: After BIIGLE sync (Step 7); `annotated_by` value: `expert`
+
+
+<a id="pipeline-status-model"></a>
+Pipeline Status Model
+
+Each deployment tracks five independent sections that progress separately:
 
 ```
 Section       States
@@ -260,7 +282,8 @@ reporting     reporting_pending → reporting_complete
 Each section has its own `_error` state. Sections advance independently —
 Zooniverse and BIIGLE can run in parallel on the same deployment.
 
-### Annotation Trust Hierarchy
+<a id="annotation-trust-hierarchy"></a>
+Annotation Trust Hierarchy
 
 Three sources of annotation, with a clear hierarchy:
 
@@ -273,9 +296,8 @@ All three are stored in the same `annotations` table. When expert annotations
 exist for a deployment, they are the authoritative record for reporting and
 model retraining. ML and citsci annotations remain for comparison and auditing.
 
----
-
-## S3 Bucket Layout
+<a id="s3-bucket-layout"></a>
+S3 Bucket Layout
 
 ```
 marine-buv/                           (production, DOC-managed)
@@ -301,9 +323,8 @@ marine-buv/                           (production, DOC-managed)
     └── models/                       ← YOLO weights (production + base)
 ```
 
----
-
-## Naming Conventions
+<a id="naming-conventions"></a>
+Naming Conventions
 
 ```
 AHE_20250513_BUV_AHE_057_01
@@ -315,24 +336,26 @@ AHE_20250513_BUV_AHE_057_01
 └─────────────────────────── Location code
 ```
 
-- **DropID** = one camera deployment = one video
-- **SurveyID** = `AHE_20250513_BUV` (groups drops from the same trip)
-- **SiteID** = `AHE_057` (the physical monitoring site)
+DropID = one camera deployment = one video
 
----
+SurveyID = `AHE_20250513_BUV` (groups drops from the same trip)
 
-## ML Model Strategy
+SiteID = `AHE_057` (the physical monitoring site)
 
-The model starts as a **binary classifier** (fish vs no-fish) and evolves into a
-**multi-class detector** as training data accumulates for each species.
+<a id="ml-model-strategy"></a>
+ML Model Strategy
+
+The model starts as a binary classifier (fish vs no-fish) and evolves into a
+multi-class detector as training data accumulates for each species.
 
 Species with fewer than 200 annotated frames are automatically merged into a
-generic "fish" class (the *floor*) during training — they'll be promoted to
+generic "fish" class (the floor) during training, they'll be promoted to
 their own class once enough expert annotations exist.
 
-### Model Versioning
+<a id="model-versioning"></a>
+Model Versioning
 
-Each model version is identified by its **weight filename stem**, which encodes
+Each model version is identified by its weight filename stem, which encodes
 the training context:
 
 ```
@@ -343,14 +366,16 @@ cfd_binary_water_20260301
 └───────────────────────── Project prefix
 ```
 
-| Artifact | Location | Purpose |
-|---|---|---|
-| **Production weights** | `process_files/models/pipeline_model/` | Active model used by all inference runs |
-| **Base weights** | `process_files/models/base_model/` | Starting checkpoint for retraining |
-| **Archived weights** | `process_files/models/archived_models/` | Previous production models (rollback) |
-| **Training results** | `process_files/training/{type}/results/` | Metrics, curves, confusion matrices per run |
+Artifact: Production weights; Location: `process_files/models/pipeline_model/`; Purpose: Active model used by all inference runs
 
-The model name is embedded in every output it produces — raw detection CSVs are
+Artifact: Base weights; Location: `process_files/models/base_model/`; Purpose: Starting checkpoint for retraining
+
+Artifact: Archived weights; Location: `process_files/models/archived_models/`; Purpose: Previous production models (rollback)
+
+Artifact: Training results; Location: `process_files/training/{type}/results/`; Purpose: Metrics, curves, confusion matrices per run
+
+
+The model name is embedded in every output it produces, raw detection CSVs are
 named `{DropID}_{model_name}_raw.csv` and annotation records in `annotations.db`
 store the model name in the `external_id` field (`annotated_by` is just `ml`). This
 makes every annotation traceable to the exact model version that produced it.
@@ -358,28 +383,36 @@ Expert rows use the same field the same way: `legacy` for the historical CSV
 backfill, `biigle_volume_{id}` for a BIIGLE review, so two expert accounts of one
 deployment stay distinguishable and each ingestion path deletes only its own rows.
 
-### Dataset Versioning
+<a id="dataset-versioning"></a>
+Dataset Versioning
 
-Each retraining run produces a **reproducible snapshot** of the data used:
+Each retraining run produces a reproducible snapshot of the data used:
 
-| Artifact | What it captures |
-|---|---|
-| `data.yaml` | Class list, train/val/test paths — the YOLO contract |
-| `class_map.json` | Species → class ID mapping (including floor remaps) |
-| `excluded_drops.txt` | DropIDs removed from training |
-| `force_val_drops.txt` | DropIDs pinned to the validation split |
-| `split_seed` in config | Seed for reproducible train/val/test assignment |
+`data.yaml`: Class list, train/val/test paths. the YOLO contract
 
-- **Survey-aware splits**: Train/val/test are split at the drop level, with
+`class_map.json`: Species → class ID mapping (including floor remaps)
+
+`excluded_drops.txt`: DropIDs removed from training
+
+`force_val_drops.txt`: DropIDs pinned to the validation split
+
+`split_seed` in config: Seed for reproducible train/val/test assignment
+
+
+Survey-aware splits: Train/val/test are split at the drop level, with
+
   surveys contributing drops proportionally. No data leakage across splits.
-- **Curated exclusion lists**: Bad drops and specific drops can be pinned to val
+Curated exclusion lists: Bad drops and specific drops can be pinned to val
+
   or excluded entirely via text files.
-- **Per-drop frame cap**: Each drop contributes at most N frames (default 100)
+Per-drop frame cap: Each drop contributes at most N frames (default 100)
+
   to prevent overrepresented deployments from dominating training.
 
-### Retraining, Evaluation & Cross-Check
+<a id="retraining-evaluation--cross-check"></a>
+Retraining, Evaluation & Cross-Check
 
-Retraining is a **separate workflow** triggered after new expert annotations
+Retraining is a separate workflow triggered after new expert annotations
 are available.
 
 ```mermaid
@@ -402,30 +435,30 @@ flowchart TD
     H -->|No| K["✅ Annotations consistent"]
 ```
 
-- **Annotation conflict detection**: After promotion, the new model runs inference
+Annotation conflict detection: After promotion, the new model runs inference
+
   on a subsample of existing volunteer and ML annotations. Where the new model
   disagrees (e.g. volunteers agreed "Species A" but the model predicts "Species B"),
   those frames are flagged. The Streamlit Development Tools page can generate
   these conflicting images and export them to BIIGLE for expert re-review.
 
----
+<a id="security--sensitive-data"></a>
+Security & Sensitive Data
 
-## Security & Sensitive Data
+⚠️ Before sharing any data or dashboard access, review against these categories:
 
-> ⚠️ **Before sharing any data or dashboard access, review against these categories:**
+Category: Locations; Example: GPS lat/lon of deployment sites; Risk: Could enable illegal fishing
 
-| Category | Example | Risk |
-|---|---|---|
-| **Locations** | GPS lat/lon of deployment sites | Could enable illegal fishing |
-| **Rare species** | Presence of protected species | Could attract poaching |
-| **PII** | Names, contracts, team details | Privacy obligation |
+Category: Rare species; Example: Presence of protected species; Risk: Could attract poaching
 
-**Credentials:** All secrets in `.env` (never committed). AWS keys, BIIGLE tokens,
+Category: PII; Example: Names, contracts, team details; Risk: Privacy obligation
+
+
+Credentials: All secrets in `.env` (never committed). AWS keys, BIIGLE tokens,
 Zooniverse credentials are loaded at startup via `python-dotenv`.
 
----
-
-## Contributing
+<a id="contributing"></a>
+Contributing
 
 For detailed technical documentation (state machines, module reference,
 configuration reference), see [`design_doc.md`](design_doc.md).

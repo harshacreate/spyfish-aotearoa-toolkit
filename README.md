@@ -1,90 +1,45 @@
-# Spyfish Aotearoa Pipeline
+Spyfish Aotearoa toolkit
 
-Automated pipeline for processing marine Baited Underwater Video (BUV) footage
-from New Zealand's marine reserves: metadata ingestion, ML fish detection,
-Zooniverse citizen science, BIIGLE expert annotation, and dashboard
-visualisation.
+This is my copy of the [Spyfish Aotearoa toolkit](https://github.com/wildlifeai/spyfish-aotearoa-toolkit). The original project and its contributors keep credit for their work.
 
-> Work in progress: we are actively working on the pipeline, so details change
-> often. Reach out if you want to use the pipeline or contribute, or if you
-> have questions, ideas or feedback.
+The toolkit helps study fish in underwater videos from New Zealand marine reserves. It checks camera records, finds fish with a machine learning model, collects labels from volunteers and experts, and shows the results. The project is still being developed.
 
-## How it works
+How it works
 
-Rangers deploy baited cameras and upload ~30-minute videos to S3. From there
-the pipeline takes over:
+Rangers place baited cameras in the water and upload videos to S3. The toolkit checks the camera records and saves valid records in a SQLite database.
 
-1. **Ingest**: deployment metadata from SharePoint exports is validated and
-   loaded into a SQLite database. Only valid deployments move on.
-2. **ML inference**: the fine tuned Community Fish Detector, a YOLO model, scans each video for fish and writes
-   per-species abundance (MaxN) estimates.
-3. **Citizen science**: short clips are uploaded to
-   [Zooniverse](https://www.zooniverse.org/projects/victorav/spyfish-aotearoa),
-   where volunteers classify species. Their consensus is aggregated once
-   subjects retire. Currently reviewing this step to make citsci annotaiton more efficient, meaning fewer volunteers per annotation.
-4. **Expert review**: selected frames go to [BIIGLE](https://biigle.de), where
-   marine experts confirm species identities. Expert annotations are the final truth.
-5. **Reporting & retraining**: results feed the dashboard and DOC reporting,
-   and confirmed annotations grow the training set for the next model.
+A YOLO model scans each video for fish and estimates the largest number of each species visible at once, called MaxN.
 
-Each stage tracks its own status per deployment, so stages progress
-independently rather than in one fragile chain.
+Volunteers label short clips on [Zooniverse](https://www.zooniverse.org/projects/victorav/spyfish-aotearoa). Marine experts review selected images on [BIIGLE](https://biigle.de). The project uses the expert labels as its reference for checking results and training the model again.
 
-## Quick start
+Each step keeps its own progress record. The dashboard shows the results and helps the team prepare reports.
+
+Run it
 
 ```bash
 pip install -r requirements.txt
 pip install -e .
 
-# Secrets live in .env (never in git): AWS, BIIGLE and Zooniverse credentials
-#: see design_doc.md for the full list.
-
-python run_pipeline.py --ping     # config + connectivity check
-python run_pipeline.py            # run all default pipeline steps
-python run_pipeline.py --ml       # or run a single step
-
-# Ops dashboard
+# Keep AWS, BIIGLE and Zooniverse credentials in .env, never in Git.
+# See design_doc.md for the settings you need.
+python run_pipeline.py --ping
+python run_pipeline.py
+python run_pipeline.py --ml
 streamlit run "app/🐟_Spyfish_Data_Tools.py"
 ```
 
-Tests: `pytest tests/` (unit tests need no external services; integration tests
-need FFmpeg).
+Run `pytest tests/` to check the code. Unit tests do not need outside services. Integration tests need FFmpeg.
 
-## Running in production (HPC / SLURM)
+The original project uses New Zealand's NeSI computing service for scheduled runs. `run_pipeline.sl` runs the video processing steps. `spyfish/ml/training/train_job.sl` trains the model. Both use SLURM. The same Python commands can also run on a local computer with the required files, tools and service access.
 
-The pipeline runs in production on New Zealand's NeSI HPC platform, not on a
-server of ours. Scheduled runs are submitted as [SLURM](https://slurm.schedmd.com/)
-batch jobs:
+Main files
 
-- `run_pipeline.sl`: the batch script for regular pipeline runs (GPU node for
-  ML inference), triggered on a schedule via crontab on the login node.
-- `spyfish/ml/training/train_job.sl`: the batch script for model retraining.
+`spyfish/` contains the code that reads videos, manages records and calls the other services.
 
-The environment on NeSI is a plain Python venv, and large video
-downloads go to a scratch filesystem via the `media_base_dir` override in
-`config.yaml`. Everything in Quick start above also works on a laptop: the
-SLURM scripts just wrap the same `run_pipeline.py` CLI.
+`app/` contains the dashboard. `run_pipeline.py` starts the processing steps. `config.yaml` holds the settings. `tests/` contains checks for the code. `scripts/` contains support tools.
 
-## Repository layout
+More information
 
-| Path | What it holds |
-|---|---|
-| `spyfish/` | Pipeline library: config, database, extraction, ML, Zooniverse, BIIGLE, orchestrators |
-| `app/` | Streamlit dashboard (ops views + DOC reporting) |
-| `run_pipeline.py` | CLI entrypoint: one flag per pipeline stage |
-| `config.yaml` | Single source of truth for all configuration |
-| `tests/` | Unit + integration tests |
-| `scripts/` | One-off and maintenance scripts |
+Read [the design guide](design_doc.md) for settings, commands and how the parts work together. See [the system guide](ARCHITECTURE.md) for diagrams and [the project wiki](https://spyfish.notion.site/overview) for tutorials.
 
-## Documentation
-
-- **[design_doc.md](design_doc.md)**: the full picture: architecture,
-  decisions, CLI reference, configuration, module reference.
-- **[ARCHITECTURE.md](ARCHITECTURE.md)**: system overview and diagrams.
-- **[Project wiki](https://spyfish.notion.site/overview)**: tutorials and
-  contributor information.
-
-## Links
-
-- [Zooniverse project](https://www.zooniverse.org/projects/victorav/spyfish-aotearoa): help classify fish!
-- [Project website](https://wildlife.ai/projects/spyfish-aotearoa/): news and updates.
+The [project website](https://wildlife.ai/projects/spyfish-aotearoa/) has news and updates. Keep the original source credits and license notices when sharing this work.

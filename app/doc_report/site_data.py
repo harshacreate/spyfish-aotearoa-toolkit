@@ -43,7 +43,7 @@ UNKNOWN = "unknown"
 #
 # Site coordinates joined to abundance are effectively a ranked fishing map,
 # and for rare species a poaching aid, see the sensitive-data rule in
-# CLAUDE.md. Every view that wants coordinates goes through these two
+# PROJECT_NOTES.md. Every view that wants coordinates goes through these two
 # functions, so a deploy cannot forget a gate that lives in one caller.
 
 _MAP_SECRET = (

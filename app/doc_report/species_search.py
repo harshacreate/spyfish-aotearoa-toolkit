@@ -64,7 +64,7 @@ def render(ctx: dict) -> None:
     options = lookup["display_name"].tolist()
     # Open on something memorable (a moray, a ray) rather than the commonest
     # species, but never a rare or fished one: the landing state of this
-    # page lists where a species was seen (CLAUDE.md, "Sensitive data").
+    # page lists where a species was seen (PROJECT_NOTES.md, "Sensitive data").
     # The preference list lives in config; indicator species are the
     # fallback, then the first name in the list.
     sci_options = lookup["scientific_name"].tolist()
