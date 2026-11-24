@@ -1165,7 +1165,7 @@ These are complementary tools, not competing choices.
 <a id="future-direction-multi-project-support-spyfish-anywhere"></a>
 Future direction: multi-project support (Spyfish Anywhere)
 
-Generalizing the pipeline to support other camera-trap projects (different methodologies, regions, metadata sources), same repo, layered profiles, internal schema pipeline-shaped with opportunistic Darwin Core alignment, exports to DwC-A Event Core for OBIS/GBIF publishing. See [`claude_docs/anywhere_plan.md`](claude_docs/anywhere_plan.md).
+The project plans to support camera studies in other regions and with different data sources. Each study can use its own settings. The plan also includes exporting data in Darwin Core Event format for OBIS and GBIF.
 
 <a id="11-milestones"></a>
 11. Milestones
