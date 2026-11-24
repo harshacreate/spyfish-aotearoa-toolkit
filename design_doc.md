@@ -27,7 +27,7 @@ Table of Contents
 [Success criteria](#success-criteria)
 
 3. [System Context](#3-system-context)
-[Data flow](#data-flow-1)
+[Data flow](#data-flow)
 
 [Who uses what](#who-uses-what)
 
@@ -93,9 +93,9 @@ Table of Contents
     - [Clip selection: random vs ML-guided](#clip-selection-random-sampling-vs-ml-guided)
     - [Reporting: Streamlit vs PowerBI](#reporting-dashboard-streamlit-vs-powerbi)
 11. [Milestones](#11-milestones)
-[Phase 1, Core Pipeline](#phase-1--core-pipeline--near-complete)
+[Phase 1, Core Pipeline](#phase-1--core-pipeline--complete)
 
-    - [Phase 2 — Annotation Platforms](#phase-2--annotation-platforms--in-progress)
+    - [Phase 2 — Annotation Platforms](#phase-2--annotation-platforms--complete)
     - [Phase 3 — Model Improvement Loop](#phase-3--model-improvement-loop)
     - [Phase 4 — User Interaction & Admin](#phase-4--user-interaction--admin)
     - [Phase 5 — Production Hardening](#phase-5--production-hardening)
