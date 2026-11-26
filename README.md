@@ -16,8 +16,11 @@ the pipeline takes over:
 
 1. **Ingest**: deployment metadata from SharePoint exports is validated and
    loaded into a SQLite database. Only valid deployments move on.
-2. **ML inference**: the fine tuned Community Fish Detector, a YOLO model, scans each video for fish and writes
-   per-species abundance (MaxN) estimates.
+2. **ML inference**: the configured YOLO model scans each video and writes
+   detections for review and abundance estimates. The public Community Fish
+   Detector is a one-class model: it labels detections as `fish`, not by
+   species. See the [local model setup guide](docs/community_fish_detector.md)
+   to use it for a volunteer run.
 3. **Citizen science**: short clips are uploaded to
    [Zooniverse](https://www.zooniverse.org/projects/victorav/spyfish-aotearoa),
    where volunteers classify species. Their consensus is aggregated once
@@ -81,6 +84,8 @@ SLURM scripts just wrap the same `run_pipeline.py` CLI.
 - **[design_doc.md](design_doc.md)**: the full picture: architecture,
   decisions, CLI reference, configuration, module reference.
 - **[ARCHITECTURE.md](ARCHITECTURE.md)**: system overview and diagrams.
+- **[Community Fish Detector setup](docs/community_fish_detector.md)**: use the
+  public YOLO weights for a local run.
 - **[Project wiki](https://spyfish.notion.site/overview)**: tutorials and
   contributor information.
 
